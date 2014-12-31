@@ -1,0 +1,40 @@
+/*
+	Base Styles, can be over-ridden in your theme css....
+*/
+.team-member {
+	padding: 25px 0;
+	border-bottom: 1px solid #4f0544; 
+}
+
+.team-member:last-child {
+	border-bottom: none!important;
+}
+
+.team-member .name {
+	color: #4f0544;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.team-member .qual {
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.team-member .email {
+	padding-bottom: 10px!important;
+}
+
+.team-member .desc p {
+	margin-bottom: 0!important;
+}
+
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) {
+/* Styles */
+
+	.team-member {
+		text-align: center;
+	}
+} 
