@@ -152,6 +152,66 @@ class Bazzoo_Team {
 		    register_post_type( 'team_members', $args );
 		}
 
+		add_action( 'load-post.php', 'smashing_post_meta_boxes_setup' );
+        add_action( 'load-post-new.php', 'smashing_post_meta_boxes_setup' );
+
+        /* Meta box setup function. */
+        function smashing_post_meta_boxes_setup() {
+
+          /* Add meta boxes on the 'add_meta_boxes' hook. */
+          add_action( 'add_meta_boxes', 'smashing_add_post_meta_boxes' );
+
+          /* Save post meta on the 'save_post' hook. */
+          add_action( 'save_post', 'prfx_meta_save' );
+        }
+
+        /* Create one or more meta boxes to be displayed on the post editor screen. */
+        function smashing_add_post_meta_boxes() {
+
+          add_meta_box(
+            'smashing-post-class',      // Unique ID
+            esc_html__( 'Team Member Info', 'example' ),    // Title
+            'smashing_post_class_meta_box',   // Callback function
+            'team_members',         // Admin page (or post type)
+            'side',         // Context
+            'high'         // Priority
+          );
+        }
+
+        /* Display the post meta box. */
+		function smashing_post_class_meta_box( $object, $box ) { ?>
+
+		  <?php wp_nonce_field( basename( __FILE__ ), 'smashing_post_class_nonce' ); ?>
+
+		  <p>
+		    <label for="qualifications"><?php _e( "Qualifications", 'qualificiations' ); ?></label>
+		    <br />
+		    <input class="widefat" type="text" name="qualifications" id="qualifications" value="<?php echo esc_attr( get_post_meta( $object->ID, 'qualifications', true ) ); ?>" size="30" />
+		  </p>
+		  <p>
+		    <label for="email"><?php _e( "Email", 'email' ); ?></label>
+		    <br />
+		    <input class="widefat" type="text" name="email" id="email" value="<?php echo esc_attr( get_post_meta( $object->ID, 'email', true ) ); ?>" size="30" />
+		  </p>
+		<?php }
+
+		function prfx_meta_save( $post_id ) {
+ 
+    // Checks save status
+    $is_autosave = wp_is_post_autosave( $post_id );
+    $is_revision = wp_is_post_revision( $post_id );
+ 
+    // Checks for input and sanitizes/saves if needed
+    if( isset( $_POST[ 'qualifications' ] ) ) {
+        update_post_meta( $post_id, 'qualifications', sanitize_text_field( $_POST[ 'qualifications' ] ) );
+    }
+
+    if( isset( $_POST[ 'email' ] ) ) {
+        update_post_meta( $post_id, 'email', sanitize_text_field( $_POST[ 'email' ] ) );
+    }
+ 
+}
+
 		function shortcode_func( $atts ){
 			global $post;
 			$posts = get_posts( array( 'post_type' => 'team_members', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC' ) );
@@ -159,7 +219,12 @@ class Bazzoo_Team {
 			   foreach( $posts as $post ) :   
 			    setup_postdata($post); ?>
 			    	
-			    	<?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' ); ?>
+			    	<?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' );
+
+			    	$qualifications = get_post_meta( get_the_ID(), 'qualifications', true );
+			    	$email = get_post_meta( get_the_ID(), 'email', true );
+
+			    	?>
 
 					<div class="team-member">
 						<div class="fusion-one-fourth one_fourth fusion-column">
@@ -170,8 +235,8 @@ class Bazzoo_Team {
 						<div class="fusion-three-fourth three_fourth fusion-column last">
 							<div class="desc">
 								<p class="name"><?php the_title(); ?></p>
-								<p class="qual"><?php the_field('qualifications'); ?></p>
-								<p class="email"><a href="mailto:<?php the_field('email'); ?>"><?php the_field('email'); ?></a></p>
+								<p class="qual"><?php echo $qualifications; ?></p>
+								<p class="email"><a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a></p>
 								<p class="content"><?php the_content(); ?></p>
 							</div>
 						</div>
