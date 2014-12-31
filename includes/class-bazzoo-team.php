@@ -152,6 +152,39 @@ class Bazzoo_Team {
 		    register_post_type( 'team_members', $args );
 		}
 
+		function shortcode_func( $atts ){
+			global $post;
+			$posts = get_posts( array( 'post_type' => 'team_members', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC' ) );
+			if( $posts ):
+			   foreach( $posts as $post ) :   
+			    setup_postdata($post); ?>
+			    	
+			    	<?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' ); ?>
+
+					<div class="team-member">
+						<div class="fusion-one-fourth one_fourth fusion-column">
+							<div class="image">
+								<img src="<?php echo $image[0]; ?>" alt="">
+							</div>
+						</div>
+						<div class="fusion-three-fourth three_fourth fusion-column last">
+							<div class="desc">
+								<p class="name"><?php the_title(); ?></p>
+								<p class="qual"><?php the_field('qualifications'); ?></p>
+								<p class="email"><a href="mailto:<?php the_field('email'); ?>"><?php the_field('email'); ?></a></p>
+								<p class="content"><?php the_content(); ?></p>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+
+
+			   <?php endforeach; 
+			wp_reset_postdata(); 
+			endif;
+		}
+		add_shortcode( 'bazzoo-team', 'shortcode_func' );
+
 		// Handle localisation
 		$this->load_plugin_textdomain();
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
